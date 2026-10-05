@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from app.webhook import router as webhook_router
 
 from app.chatbot import get_chatbot_response
@@ -12,13 +13,20 @@ app = FastAPI(title="StudyGuide AI")
 app.include_router(webhook_router)
 
 
+class ChatRequest(BaseModel):
+    whatsapp_number: str
+    user_message: str
+
+
 @app.get("/")
 def home():
     return {"message": "StudyGuide AI is running"}
 
 
 @app.post("/chat")
-def chat(whatsapp_number: str, user_message: str):
+def chat(request: ChatRequest):
+    whatsapp_number = request.whatsapp_number
+    user_message = request.user_message
 
     student = get_student(whatsapp_number)
 

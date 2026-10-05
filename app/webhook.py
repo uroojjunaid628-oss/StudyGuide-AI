@@ -138,6 +138,10 @@ async def receive_webhook(request: Request):
 
 def send_whatsapp_message(recipient, message):
 
+    if not PHONE_NUMBER_ID or not ACCESS_TOKEN:
+        print("Meta WhatsApp credentials (PHONE_NUMBER_ID or ACCESS_TOKEN) not set.")
+        return
+
     url = (
         f"https://graph.facebook.com/v23.0/"
         f"{PHONE_NUMBER_ID}/messages"
@@ -157,15 +161,18 @@ def send_whatsapp_message(recipient, message):
         }
     }
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload
-    )
-
-    print("WhatsApp API response:")
-    print(response.status_code)
-    print(response.text)
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=10
+        )
+        print("WhatsApp API response:")
+        print(response.status_code)
+        print(response.text)
+    except Exception as e:
+        print(f"Error sending WhatsApp message: {e}")
 
 
 
@@ -176,6 +183,10 @@ def send_to_google_sheets(
     whatsapp_number,
     profile
 ):
+
+    if not GOOGLE_SHEETS_WEBHOOK_URL:
+        print("GOOGLE_SHEETS_WEBHOOK_URL is not configured.")
+        return
 
     # Prepare the data using the same fields
     # as the Google Sheet columns
@@ -200,11 +211,14 @@ def send_to_google_sheets(
 
     # Send the completed profile to the
     # Google Apps Script web app
-    response = requests.post(
-        GOOGLE_SHEETS_WEBHOOK_URL,
-        json=payload
-    )
-
-    print("Google Sheets response:")
-    print(response.status_code)
-    print(response.text)
+    try:
+        response = requests.post(
+            GOOGLE_SHEETS_WEBHOOK_URL,
+            json=payload,
+            timeout=10
+        )
+        print("Google Sheets response:")
+        print(response.status_code)
+        print(response.text)
+    except Exception as e:
+        print(f"Error sending data to Google Sheets: {e}")

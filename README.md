@@ -116,8 +116,8 @@ The endpoint loads the student's profile, runs the model, persists the update, a
 
 ```bash
 curl -X POST "http://localhost:8000/chat" \
-  -d "whatsapp_number=923001234567" \
-  -d "user_message=I want to study Computer Science in Italy"
+  -H "Content-Type: application/json" \
+  -d '{"whatsapp_number": "923001234567", "user_message": "I want to study Computer Science in Italy"}'
 ```
 
 ### `GET /webhook`
